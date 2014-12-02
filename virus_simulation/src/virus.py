@@ -49,8 +49,7 @@ class SimpleVirus(object):
         if random.random() < self.max_birth_prob * (1 - pop_density):
             return SimpleVirus(self.max_birth_prob, self.clear_prob)
         else:
-            raise NoChildException
-
+            raise NoChildException()
 
 
 class ResistantVirus(SimpleVirus):
@@ -83,11 +82,40 @@ class ResistantVirus(SimpleVirus):
     def reproduce(self, pop_density, active_drugs):
         """Stochastically determines whether the virus instance reproduces itself
             This method is called from Patient instances.
-            The virus will only be able to reproduce if it is resistant to all of the active_drugs. If it is, then
+            The virus will only be able to reproduce if it is resistant to ALL of the active_drugs. If it is, then
             the probability that the virus will reproduce is given by self.max_birth_prob * (1 - pop_density).
+            For each resistance, the probability that the new virus will "flip" the progenitor's resistances
+            is given by 1 - self.mut_prob.
 
-        :param pop_density:
-        :param active_drugs:
+        :param pop_density: float between 0 and 1, current virus population divided by the
+            maximum population
+        :param active_drugs: list of str, contains all the drugs currently in effect (against which the virus'
+            resistances myust be checked)
         :return: if the reproduction succeeds, a new instance of the SimpleVirus class with the same max_birth_prob
             and clear_prob as the current instance. Otherwise an exception is raised
         """
+
+        def generate_new_resistances(resistances, mut_prob):
+            """ Helper method used to stochastically "flip" the resistances of new viruses
+            :param resistances: dict <str, boolean>, maps each drug to True if the parent virus has a
+                resistance to it, False otherwise
+            :param mut_prob: float between 0 and 1, parent virus' mutation probability
+            :return: the new list of resistances for the offspring
+            """
+            new_res = resistances.copy()
+
+            for k in new_res.keys():
+                if random.random() <= mut_prob:
+                    new_res[k] = not new_res[k]
+
+            return new_resistances
+
+        working_drugs = [not self.is_resistant_to(drug) for drug in active_drugs]
+        if all(working_drugs) and not len(working_drugs) == 0:
+            raise NoChildException()
+        else:
+            if random.random() <= self.max_birth_prob * (1 - pop_density):
+                new_resistances = generate_new_resistances(self.resistances, self.mut_prob)
+                return ResistantVirus(self.max_birth_prob, self.clear_prob, new_resistances, self.mut_prob)
+            else:
+                raise NoChildException()
