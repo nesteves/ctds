@@ -62,7 +62,7 @@ class ResistantVirus(SimpleVirus):
             virus particle's resistance to them
         :param mut_prob: float between 0 and 1, mutation probability when the virus reproduces
         """
-        SimpleVirus.__init__(max_birth_prob, clear_prob)
+        SimpleVirus.__init__(self, max_birth_prob, clear_prob)
         self.resistances = resistances
         self.mut_prob = mut_prob
 
@@ -75,11 +75,11 @@ class ResistantVirus(SimpleVirus):
     def is_resistant_to(self, drug):
         """ Get the state of the virus instance's resistance to a given drug
         :param drug: str, name of the drug
-        :return: boolean, True if the virus is resitant to the drug, False otherwise
+        :return: boolean, True if the virus is resistant to the drug, False otherwise
         """
         return self.resistances.get(drug, False)
 
-    def reproduce(self, pop_density, active_drugs):
+    def reproduce(self, pop_density, active_drugs=[]):
         """Stochastically determines whether the virus instance reproduces itself
             This method is called from Patient instances.
             The virus will only be able to reproduce if it is resistant to ALL of the active_drugs. If it is, then
@@ -108,7 +108,7 @@ class ResistantVirus(SimpleVirus):
                 if random.random() <= mut_prob:
                     new_res[k] = not new_res[k]
 
-            return new_resistances
+            return new_res
 
         working_drugs = [not self.is_resistant_to(drug) for drug in active_drugs]
         if all(working_drugs) and not len(working_drugs) == 0:
