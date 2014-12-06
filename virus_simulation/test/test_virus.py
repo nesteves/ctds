@@ -86,12 +86,12 @@ class ResistantVirusTestCase(unittest.TestCase):
         mock_random.return_value = 0.49
         child_virus = self.test_virus.reproduce(0, ['drug1', 'drug2'])
         self.assertEqual(child_virus.get_max_birth_prob(), self.test_virus.get_max_birth_prob(),
-                          'Successful reproduction should result in a new virus with the same max birth probability.')
+                         'Successful reproduction should result in a new virus with the same max birth probability.')
         self.assertEqual(child_virus.get_clear_prob(), self.test_virus.get_clear_prob(),
-                          'Successful reproduction should result in a new virus with the same clearing probability.')
+                         'Successful reproduction should result in a new virus with the same clearing probability.')
         self.assertEqual(child_virus.get_resistances(), self.test_virus.get_resistances(),
-                          'Successful reproduction with no mutation should result in a new '
-                          'virus with the same resistances.')
+                         'Successful reproduction with no mutation should result in a new '
+                         'virus with the same resistances.')
 
         # Test the method with a higher population density. Requires a smaller random.random() which enables mutation
         mock_random.return_value = 0.19
