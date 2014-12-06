@@ -2,7 +2,7 @@ __author__ = 'nunoe'
 
 import unittest
 from unittest import mock
-from src.virus import *
+from src.virus import SimpleVirus, ResistantVirus, NoChildException
 
 
 class SimpleVirusTestCase(unittest.TestCase):
@@ -13,7 +13,7 @@ class SimpleVirusTestCase(unittest.TestCase):
         self.test_virus = SimpleVirus(self.birth_prob, self.clear_prob)
 
     def test_get_max_birth_prob(self):
-        self.assertEquals(self.test_virus.get_max_birth_prob(), self.birth_prob)
+        self.assertEqual(self.test_virus.get_max_birth_prob(), self.birth_prob)
 
     def test_get_clear_prob(self):
         self.assertEqual(self.test_virus.get_clear_prob(), self.clear_prob)
@@ -68,10 +68,10 @@ class ResistantVirusTestCase(unittest.TestCase):
                                          self.resistances, self.mut_prob)
 
     def test_get_resistances(self):
-        self.assertEquals(self.test_virus.get_resistances(), self.resistances)
+        self.assertEqual(self.test_virus.get_resistances(), self.resistances)
 
     def test_get_mut_prob(self):
-        self.assertEquals(self.test_virus.get_mut_prob(), self.mut_prob)
+        self.assertEqual(self.test_virus.get_mut_prob(), self.mut_prob)
 
     def test_is_resistant_to(self):
         self.assertTrue(self.test_virus.get_resistances()['drug1'],
@@ -85,24 +85,24 @@ class ResistantVirusTestCase(unittest.TestCase):
         # Test the method with 0 population density. Allows for a high random.random() which prevents mutation
         mock_random.return_value = 0.49
         child_virus = self.test_virus.reproduce(0, ['drug1', 'drug2'])
-        self.assertEquals(child_virus.get_max_birth_prob(), self.test_virus.get_max_birth_prob(),
+        self.assertEqual(child_virus.get_max_birth_prob(), self.test_virus.get_max_birth_prob(),
                           'Successful reproduction should result in a new virus with the same max birth probability.')
-        self.assertEquals(child_virus.get_clear_prob(), self.test_virus.get_clear_prob(),
+        self.assertEqual(child_virus.get_clear_prob(), self.test_virus.get_clear_prob(),
                           'Successful reproduction should result in a new virus with the same clearing probability.')
-        self.assertEquals(child_virus.get_resistances(), self.test_virus.get_resistances(),
+        self.assertEqual(child_virus.get_resistances(), self.test_virus.get_resistances(),
                           'Successful reproduction with no mutation should result in a new '
                           'virus with the same resistances.')
 
         # Test the method with a higher population density. Requires a smaller random.random() which enables mutation
         mock_random.return_value = 0.19
         child_virus = self.test_virus.reproduce(0.5, [])
-        self.assertEquals(child_virus.get_max_birth_prob(), self.test_virus.get_max_birth_prob(),
-                          'Successful reproduction should result in a new virus with the same max birth probability.')
-        self.assertEquals(child_virus.get_clear_prob(), self.test_virus.get_clear_prob(),
-                          'Successful reproduction should result in a new virus with the same clearing probability.')
-        self.assertEquals(child_virus.get_resistances(), {k: not res for (k, res) in self.test_virus.get_resistances().items()},
-                          'Successful reproduction with mutation should result in a new '
-                          'virus with the reversed.')
+        self.assertEqual(child_virus.get_max_birth_prob(), self.test_virus.get_max_birth_prob(),
+                         'Successful reproduction should result in a new virus with the same max birth probability.')
+        self.assertEqual(child_virus.get_clear_prob(), self.test_virus.get_clear_prob(),
+                         'Successful reproduction should result in a new virus with the same clearing probability.')
+        self.assertEqual(child_virus.get_resistances(), {k: not res for (k, res) in self.test_virus.get_resistances().items()},
+                         'Successful reproduction with mutation should result in a new '
+                         'virus with the reversed.')
 
     @mock.patch('random.random')
     def test_reproduce_fails(self, mock_random):
@@ -114,3 +114,7 @@ class ResistantVirusTestCase(unittest.TestCase):
         # Make the method fail because of the active drugs
         mock_random.return_value = 0.49
         self.assertRaises(NoChildException, self.test_virus.reproduce, 0, ['drug2'])
+
+
+if __name__ == '__main__':
+    unittest.main()
