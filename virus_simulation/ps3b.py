@@ -489,7 +489,7 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
 
 
 if __name__ == '__main__':
-    #simulationWithoutDrug(100, 1000, 0.1, 0.05, 10)
+    simulationWithoutDrug(100, 1000, 0.1, 0.05, 10)
     #simulationWithoutDrug(1, 90, 0.8, 0.1, 1)
 
     #simulationWithDrug(100, 1000, 0.1, 0.05, {'guttagonol': False}, 0.05, 100)
