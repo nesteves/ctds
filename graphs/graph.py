@@ -102,7 +102,7 @@ class Digraph(object):
         :param origin: Node, the node to start the search on
         :param node: Node, the node to be found
         :param path_taken: list of Nodes, current path, gets filled as the search progresses
-        :return: list of Nodes, representing the path to node, or an empty list otherwise
+        :return: list of Nodes, representing the path to the searched node, or an empty list otherwise
         """
         path_taken = path_taken + [origin]
 
@@ -119,9 +119,9 @@ class Digraph(object):
     def breadth_first_search(self, origin, node):
         """
         Method used to search for a particular node using breadth first search
-        :param origin:
-        :param node:
-        :return:
+        :param origin: Node, the node to start the search on
+        :param node: Node, the node to be found
+        :return: list of Nodes, representing the path to the searched node, or an empty list otherwise
         """
         paths_taken = [[origin]]
 
