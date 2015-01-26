@@ -81,6 +81,11 @@ class Digraph(object):
         self.changed = True
 
     def children_of(self, node):
+        """
+        Returns the nodes to which the given node has an edge connecting both
+        :param node: Node, node for which to return the children
+        :return: list of Nodes, those node to which the node given as argument has an edge
+        """
         assert isinstance(node, Node), 'This method expects a Node.'
         return self.edges[node]
 
