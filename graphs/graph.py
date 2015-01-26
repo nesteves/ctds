@@ -17,7 +17,7 @@ class Node(object):
         return hash(self.name)
 
     def __eq__(self, other):
-        return self.name == other.get_name
+        return self.name == other.get_name()
 
 
 class Edge(object):
@@ -59,6 +59,7 @@ class Digraph(object):
     def __init__(self):
         self.nodes = set([])
         self.edges = {}
+        self.changed = True
 
     def add_node(self, node):
         assert isinstance(node, Node), 'This method expects a Node.'
@@ -67,6 +68,7 @@ class Digraph(object):
         else:
             self.nodes.add(node)
             self.edges[node] = []
+            self.changed = True
 
     def add_edge(self, edge):
         assert isinstance(edge, Edge), 'This method expect an Edge.'
@@ -76,6 +78,7 @@ class Digraph(object):
         if not (src in self.nodes and dest in self.nodes):
             raise ValueError('At least one of the nodes is missing from the graph.')
         self.edges[src].append(dest)
+        self.changed = True
 
     def children_of(self, node):
         assert isinstance(node, Node), 'This method expects a Node.'
@@ -92,6 +95,49 @@ class Digraph(object):
                 res += '{!s} -> {!s}\n'.format(node, child)
         return res[:-1]
 
+    def depth_first_search(self, origin, node, path_taken=[]):
+        """
+        Method used to search for a particular node using depth first search on the graph.
+        This method gets called recursively until it returns a path to the node being searched, or an empty list.
+        :param origin: Node, the node to start the search on
+        :param node: Node, the node to be found
+        :param path_taken: list of Nodes, current path, gets filled as the search progresses
+        :return: list of Nodes, representing the path to node, or an empty list otherwise
+        """
+        path_taken = path_taken + [origin]
+
+        if origin == node:
+            return path_taken
+
+        for n in self.children_of(origin):
+            if n not in path_taken:
+                new_path = self.depth_first_search(n, node, path_taken)
+                if new_path is not None:
+                    return new_path
+        return None
+
+    def breadth_first_search(self, origin, node):
+        """
+        Method used to search for a particular node using breadth first search
+        :param origin:
+        :param node:
+        :return:
+        """
+        paths_taken = [[origin]]
+
+        if origin == node:
+            return paths_taken
+
+        while len(paths_taken) > 0:
+            if paths_taken[0][-1] == node:
+                return paths_taken[0]
+
+            temp_path = paths_taken.pop(0)
+            for n in self.children_of(temp_path[-1]):
+                paths_taken.append(temp_path + [n])
+
+        return None
+
 
 class Graph(Digraph):
     """ Represents a regular graph, where edges have no particular direction """
@@ -102,6 +148,7 @@ class Graph(Digraph):
 
 
 if __name__ == '__main__':
+    '''
     a = Node('a')
     b = Node('b')
     ed1 = WeightedEdge(a, b)
@@ -113,3 +160,36 @@ if __name__ == '__main__':
     gr.add_edge(ed1)
     gr.add_edge(ed2)
     print(gr)
+    '''
+
+    nodes = [Node(i) for i in range(16)]
+    gr = Digraph()
+    for n in nodes:
+        gr.add_node(n)
+
+    gr.add_edge(Edge(nodes[0], nodes[1]))
+    gr.add_edge(Edge(nodes[0], nodes[2]))
+    gr.add_edge(Edge(nodes[0], nodes[3]))
+    gr.add_edge(Edge(nodes[0], nodes[1]))
+    gr.add_edge(Edge(nodes[1], nodes[4]))
+    gr.add_edge(Edge(nodes[1], nodes[5]))
+    gr.add_edge(Edge(nodes[2], nodes[6]))
+    gr.add_edge(Edge(nodes[3], nodes[7]))
+    gr.add_edge(Edge(nodes[3], nodes[8]))
+    gr.add_edge(Edge(nodes[3], nodes[9]))
+    gr.add_edge(Edge(nodes[4], nodes[10]))
+    gr.add_edge(Edge(nodes[4], nodes[11]))
+    gr.add_edge(Edge(nodes[7], nodes[12]))
+    gr.add_edge(Edge(nodes[8], nodes[13]))
+    gr.add_edge(Edge(nodes[13], nodes[14]))
+    gr.add_edge(Edge(nodes[13], nodes[15]))
+
+    print(gr)
+
+    print('Searching for a node using depth first search:')
+    result = gr.depth_first_search(Node(0), Node(15))
+    print([str(e) for e in result])
+
+    print('Searching for a node using breadth first search:')
+    result = gr.breadth_first_search(Node(0), Node(15))
+    print([str(e) for e in result])
