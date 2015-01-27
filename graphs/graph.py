@@ -100,15 +100,19 @@ class Digraph(object):
                 res += '{!s} -> {!s}\n'.format(node, child)
         return res[:-1]
 
-    def depth_first_search(self, origin, node, path_taken=[]):
+    def depth_first_search(self, origin, node, path_taken=None, shortest_path=None):
         """
-        Method used to search for a particular node using depth first search on the graph.
-        This method gets called recursively until it returns a path to the node being searched, or an empty list.
+        Method used to search for the shortest path to a particular node using depth
+        first search on the graph. This method gets called recursively until it returns
+        a path to the node being searched, or an empty list.
         :param origin: Node, the node to start the search on
         :param node: Node, the node to be found
         :param path_taken: list of Nodes, current path, gets filled as the search progresses
-        :return: list of Nodes, representing the path to the searched node, or an empty list otherwise
+        :return: list of Nodes, representing the path to the searched node, or an empty list
+        otherwise
         """
+        if path_taken is None:
+            path_taken = []
         path_taken = path_taken + [origin]
 
         if origin == node:
@@ -116,10 +120,11 @@ class Digraph(object):
 
         for n in self.children_of(origin):
             if n not in path_taken:
-                new_path = self.depth_first_search(n, node, path_taken)
-                if new_path is not None:
-                    return new_path
-        return None
+                if shortest_path is None or len(path_taken) < len(shortest_path):
+                    new_path = self.depth_first_search(n, node, path_taken, shortest_path)
+                    if new_path is not None:
+                        shortest_path = new_path
+        return shortest_path
 
     def breadth_first_search(self, origin, node):
         """
