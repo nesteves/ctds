@@ -84,7 +84,7 @@ class Digraph(object):
         """
         Returns the nodes to which the given node has an edge connecting both
         :param node: Node, node for which to return the children
-        :return: list of Nodes, those node to which the node given as argument has an edge
+        :return: list of Nodes, those nodes to which the node given as argument has an edge
         """
         assert isinstance(node, Node), 'This method expects a Node.'
         return self.edges[node]
@@ -147,6 +147,47 @@ class Digraph(object):
                 paths_taken.append(temp_path + [n])
 
         return None
+
+
+class WeightedDigraph(Digraph):
+    """ Represents a Digraph with weighted edges """
+
+    def add_edge(self, edge):
+        assert isinstance(edge, WeightedEdge), 'This method expect an Edge.'
+        src = edge.get_source()
+        dest = edge.get_destination()
+        weight = edge.get_weight()
+
+        if not (src in self.nodes and dest in self.nodes):
+            raise ValueError('At least one of the nodes is missing from the graph.')
+        self.edges[src].append([dest, weight])
+        self.changed = True
+
+    def depth_first_search(self, origin, node, path_taken=None, shortest_path=None):
+        """
+        Method used to search for the shortest path to a particular node using depth
+        first search on the graph. This method gets called recursively until it returns
+        a path to the node being searched, or an empty list.
+        :param origin: Node, the node to start the search on
+        :param node: Node, the node to be found
+        :param path_taken: list of Nodes, current path, gets filled as the search progresses
+        :return: list of Nodes, representing the path to the searched node, or an empty list
+        otherwise
+        """
+        if path_taken is None:
+            path_taken = []
+        path_taken = path_taken + [origin]
+
+        if origin == node:
+            return path_taken
+
+        for n in self.children_of(origin):
+            if n not in path_taken:
+                if shortest_path is None or len(path_taken) < len(shortest_path):
+                    new_path = self.depth_first_search(n, node, path_taken, shortest_path)
+                    if new_path is not None:
+                        shortest_path = new_path
+        return shortest_path
 
 
 class Graph(Digraph):
